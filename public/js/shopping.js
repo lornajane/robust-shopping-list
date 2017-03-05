@@ -13,19 +13,48 @@ function newItem() {
 
     console.log(doc);
     db.put(doc).then(function () {
-        db.sync(remoteDB);
+        return db.sync(remoteDB);
+    }).then(function () {
+        return getItemList()
+    }).then(function (contents) {
+        document.getElementById('itemList').innerHTML = contents;
     }).catch(function (err) {
         console.log("OOOOPS");
         console.log(err);
     });
-        
+
+    document.getElementById('name').value = '';        
     // don't actually submit the HTML form
     return false;
+}
+
+function getItemList() {
+    return new Promise(function (resolve, reject) {
+        var formattedList = '<ul>';
+
+        db.allDocs({include_docs: true, descending: true}).then(function (response) {
+            response.rows.forEach(function (row) {
+                formattedList += "<li>" + row.doc.item + "</li>";
+            });
+            formattedList += '</ul>';
+
+            console.log(formattedList);
+            resolve(formattedList);
+        }).catch(function (err) {
+            console.log("UH OH");
+            console.log(err);
+        });
+    });
+
 }
 
 window.onload = function() {
 
     document.getElementById('newItem').onsubmit = newItem;
+
+    getItemList().then(function (contents) {
+        document.getElementById('itemList').innerHTML = contents;
+    });
     console.log("loaded");
 }
 
