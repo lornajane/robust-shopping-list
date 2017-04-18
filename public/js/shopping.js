@@ -13,8 +13,6 @@ function newItem() {
 
     console.log(doc);
     db.put(doc).then(function () {
-        return db.sync(remoteDB);
-    }).then(function () {
         return getItemList()
     }).then(function (contents) {
         document.getElementById('itemList').innerHTML = contents;
@@ -38,7 +36,7 @@ function getItemList() {
             });
             formattedList += '</ul>';
 
-            console.log(formattedList);
+            // console.log(formattedList);
             resolve(formattedList);
         }).catch(function (err) {
             console.log("UH OH");
@@ -51,6 +49,13 @@ function getItemList() {
 window.onload = function() {
 
     document.getElementById('newItem').onsubmit = newItem;
+
+	db.sync(remoteDB, { live: true }
+	).on('change', function (change) {
+		return getItemList().then(function (contents) {
+			document.getElementById('itemList').innerHTML = contents;
+		});
+	});
 
     getItemList().then(function (contents) {
         document.getElementById('itemList').innerHTML = contents;
