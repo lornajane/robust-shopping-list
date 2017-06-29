@@ -50,8 +50,12 @@ window.onload = function() {
 
     document.getElementById('newItem').onsubmit = newItem;
 
-	db.sync(remoteDB, { live: true }
+	db.sync(remoteDB, { live: true, retry: true }
 	).on('change', function (change) {
+		return getItemList().then(function (contents) {
+			document.getElementById('itemList').innerHTML = contents;
+		})
+    }).on('active', function (info) {
 		return getItemList().then(function (contents) {
 			document.getElementById('itemList').innerHTML = contents;
 		});
