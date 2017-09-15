@@ -26,13 +26,23 @@ function newItem() {
     return false;
 }
 
+function deleteItem(id, rev) {
+    db.remove(id, rev).then(function (result) {
+        return getItemList()
+    }).catch(function (err) {
+        console.log("Uh oh");
+        console.log(err);
+    });
+    return false;
+}
+
 function getItemList() {
     return new Promise(function (resolve, reject) {
         var formattedList = '<ul>';
 
         db.allDocs({include_docs: true, descending: true}).then(function (response) {
             response.rows.forEach(function (row) {
-                formattedList += "<li>" + row.doc.item + "</li>";
+                formattedList += "<li>" + row.doc.item + " &nbsp; <a href=\"#\" onclick=\"deleteItem('" + row.doc._id + "', '" + row.doc._rev + "');\">x</a></li>";
             });
             formattedList += '</ul>';
 
@@ -43,7 +53,6 @@ function getItemList() {
             console.log(err);
         });
     });
-
 }
 
 window.onload = function() {
