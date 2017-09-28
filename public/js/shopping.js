@@ -29,6 +29,8 @@ function newItem() {
 function deleteItem(id, rev) {
     db.remove(id, rev).then(function (result) {
         return getItemList()
+    }).then(function (contents) {
+        document.getElementById('itemList').innerHTML = contents;
     }).catch(function (err) {
         console.log("Uh oh");
         console.log(err);
